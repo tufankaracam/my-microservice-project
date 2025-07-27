@@ -39,12 +39,12 @@ spec:
         container('kaniko') {
           sh '''
             cd docker
-            /kaniko/executor \\
-              --context `pwd` \\
-              --dockerfile `pwd`/Dockerfile \\
-              --destination=$ECR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG \\
-              --cache=true \\
-              --insecure \\
+            /kaniko/executor \
+              --context `pwd` \
+              --dockerfile `pwd`/Dockerfile \
+              --destination=$ECR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG \
+              --cache=true \
+              --insecure \
               --skip-tls-verify
           '''
         }
@@ -58,17 +58,14 @@ spec:
             sh '''
               git clone https://$USERNAME:$PASSWORD@github.com/tufankaracam/my-microservice-project.git
               cd my-microservice-project
-              git checkout lesson-8-9
+              git checkout origin/lesson-8-9
+              git checkout -b lesson-8-9
               cd lesson-8-9/charts/django-app
-
               sed -i "s/tag: .*/tag: $IMAGE_TAG/" values.yaml
-
               git config user.email "$COMMIT_EMAIL"
               git config user.name "$COMMIT_NAME"
-
               git add values.yaml
               git commit -m "Update image tag to $IMAGE_TAG"
-              git remote set-url origin https://$USERNAME:$PASSWORD@github.com/tufankaracam/my-microservice-project.git
               git push origin lesson-8-9
             '''
           }
