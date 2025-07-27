@@ -99,13 +99,11 @@ spec:
               git clone https://$USERNAME:$PASSWORD@github.com/tufankaracam/my-microservice-project.git
               cd my-microservice-project
               git checkout origin/lesson-8-9
-              cd lesson-8-9/charts/django-app
-
+              git checkout -b lesson-8-9
+              cd charts/django-app
               sed -i "s/tag: .*/tag: $IMAGE_TAG/" values.yaml
-
               git config user.email "$COMMIT_EMAIL"
               git config user.name "$COMMIT_NAME"
-
               git add values.yaml
               git commit -m "Update image tag to $IMAGE_TAG"
               git remote set-url origin https://$USERNAME:$PASSWORD@github.com/tufankaracam/my-microservice-project.git
