@@ -1,0 +1,28 @@
+applications:
+  - name: django-app
+    namespace: default
+    project: default
+    source:            
+      repoURL: hhttps://github.com/tufankaracam/my-microservice-project.git 
+      path: charts/django-app     
+      targetRevision: lesson-8-9    
+      helm:
+        valueFiles:              
+          - values.yaml
+    destination:                              
+      server: https://kubernetes.default.svc  
+      namespace: default                      
+    syncPolicy:           
+      automated:         
+        prune: true       
+        selfHeal: true    
+
+repositories:
+  - name: django-app         
+    url: https://github.com/tufankaracam/my-microservice-project.git   
+    username: ${github_user}  
+    password: ${github_pat}
+
+repoConfig:
+  insecure: "true"    
+  enableLfs: "true"   
