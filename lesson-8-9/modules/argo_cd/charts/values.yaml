@@ -4,7 +4,7 @@ applications:
     project: default
     source:            
       repoURL: hhttps://github.com/tufankaracam/my-microservice-project.git 
-      path: charts/django-app     
+      path: lesson-8-9/charts/django-app     
       targetRevision: lesson-8-9    
       helm:
         valueFiles:              
