@@ -1,51 +1,63 @@
-# Lesson-5 Terraform Infrastructure Project
+# Lesson-7: Kubernetes + Helm Project
 
 ## Overview
-This project demonstrates Infrastructure as Code (IaC) using Terraform to deploy a modular AWS infrastructure including S3 backend, VPC networking, and ECR container registry.
+Django application deployment on AWS EKS using Terraform and Helm.
 
-## Project Structure
-lesson-5/
-│
-├── main.tf                  # Main file for connecting modules
-├── backend.tf               # Backend configuration for state (S3 + DynamoDB)
-├── outputs.tf               # Global resource outputs
-├── modules/                 # Directory with all modules
-│   │
-│   ├── s3-backend/          # Module for S3 and DynamoDB
-│   │   ├── s3.tf            # S3 bucket creation
-│   │   ├── dynamodb.tf      # DynamoDB creation
-│   │   ├── variables.tf     # Variables for S3 backend
-│   │   └── outputs.tf       # S3 and DynamoDB outputs
-│   │
-│   ├── vpc/                 # Module for VPC
-│   │   ├── vpc.tf           # VPC, subnets, Internet Gateway creation
-│   │   ├── routes.tf        # Routing configuration
-│   │   ├── variables.tf     # VPC variables
-│   │   └── outputs.tf       # VPC information outputs
-│   │
-│   └── ecr/                 # Module for ECR
-│       ├── ecr.tf           # ECR repository creation
-│       ├── variables.tf     # ECR variables
-│       └── outputs.tf       # ECR repository URL output
-│
-└── README.md                # Project documentation
+## Architecture
+- **EKS Cluster**: Managed Kubernetes on AWS
+- **ECR**: Docker image registry
+- **Helm Chart**: Django app with auto-scaling
 
+## Quick Setup
 
-## Prerequisites
-- AWS CLI configured with appropriate credentials
-- Terraform installed (version ~> 5.0)
-- AWS account with necessary permissions
-
-## Deployment Commands
-
-### Initial Setup
+### 1. Infrastructure
 ```bash
-# Initialize Terraform
 terraform init
-
-# Review planned changes
-terraform plan
-
-# Apply infrastructure
 terraform apply
 ```
+
+### 2. Docker Image
+```bash
+aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.eu-central-1.amazonaws.com
+docker build -t lesson-7-ecr .
+docker tag lesson-7-ecr:latest <account-id>.dkr.ecr.eu-central-1.amazonaws.com/lesson-7-ecr:latest
+docker push <account-id>.dkr.ecr.eu-central-1.amazonaws.com/lesson-7-ecr:latest
+```
+
+### 3. Kubernetes Setup
+```bash
+aws eks --region eu-central-1 update-kubeconfig --name lesson-7-eks
+helm install django-app ./charts/django-app
+```
+
+## Verification
+```bash
+kubectl get pods          # 2 Django pods running
+kubectl get svc           # LoadBalancer with External IP
+kubectl get hpa           # Auto-scaling 2-6 pods at 70% CPU
+kubectl get configmap     # Environment variables
+```
+
+## Project Structure
+```
+lesson-7/
+├── main.tf
+├── modules/
+│   ├── vpc/
+│   ├── ecr/
+│   └── eks/
+└── charts/django-app/
+    ├── Chart.yaml
+    ├── values.yaml
+    └── templates/
+```
+
+## Access
+- **External URL**: `kubectl get svc django-app-django`
+- **Port**: 80
+
+## Components
+- **Terraform**: EKS + ECR + VPC modules
+- **Helm**: Deployment + Service + ConfigMap + HPA
+- **Docker**: Django application image
+- **Kubernetes**: Container orchestration
