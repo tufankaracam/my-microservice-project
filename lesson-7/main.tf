@@ -19,6 +19,11 @@ provider "aws" {
   region = "eu-central-1"
 }
 
+module "s3_backend" {
+  source      = "./modules/s3-backend"
+  bucket_name = "tk-terraform-state-lesson7-000001"
+  table_name  = "terraform-locks"
+}
 
 module "vpc" {
   source             = "./modules/vpc"
